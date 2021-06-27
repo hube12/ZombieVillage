@@ -1,0 +1,73 @@
+plugins {
+    id 'java'
+    id "application"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id 'edu.sc.seis.launch4j' version '2.5.0'
+}
+
+defaultTasks("clean", "release")
+
+group 'com.seedfinding.neil'
+version '1.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://jitpack.io"
+    }
+}
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ['-Xlint:deprecation', '-Xlint:unchecked']
+    options.fork = true
+}
+
+
+application {
+    mainClassName = "ZombieVillage"
+}
+
+dependencies {
+    implementation 'com.github.KaptainWutax:SEED:master-SNAPSHOT'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+shadowJar {
+    // this needs to be removed once https://github.com/johnrengelman/shadow/issues/663 is solved
+    archiveFileName = "${project.name}-${project.version}.jar"
+}
+
+launch4j {
+    outfile = "${project.name}-${project.version}.exe"
+    outputDir = "libs"
+    supportUrl = "https://discord.gg/mn47bWvFjf"
+    jvmOptions = ["-Xms1G", "-Xmx2G"]
+    initialHeapPercent = 5
+    maxHeapPercent = 80
+    jarTask = project.tasks.shadowJar
+    productName = "Zombie Village"
+    fileDescription = "A Zombie village finder"
+    copyConfigurable = [] // don't copy lib
+    libraryDir = "ignore_libs"
+    jreMaxVersion = JavaVersion.VERSION_HIGHER
+    jreMinVersion = JavaVersion.VERSION_1_8
+    // this is a dirty fix to use JAVA_HOME
+    bundledJrePath = "%JAVA_HOME%;%PATH%"
+}
+
+task("release") {
+    dependsOn(clean)
+    dependsOn(shadowJar)
+    dependsOn(createExe)
+}
