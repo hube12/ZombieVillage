@@ -60,7 +60,6 @@ public class ZombieVillage {
         RPos minBound = new BPos(-3000, 0, -3000).toRegionPos(village.getSpacing() * 16);
         RPos maxBound = new BPos(3000, 0, 3000).toRegionPos(village.getSpacing() * 16);
         StructureSeed.getWorldSeeds(structureSeed).asStream().boxed().forEach(ws->{
-            int nbr=0;
             List<CPos> posList=new ArrayList<>();
             OverworldBiomeSource biomeSource=new OverworldBiomeSource(VERSION,ws);
             for (int regX = minBound.getX() + 1; regX <= maxBound.getX(); regX++) {
@@ -72,7 +71,7 @@ public class ZombieVillage {
                 }
             }
             if (posList.size()>5){
-                System.out.printf("Found %d zombie village for world seed %d%n",nbr,ws);
+                System.out.printf("Found %d zombie village for world seed %d%n",posList.size(),ws);
                 for(CPos pos:posList){
                     BPos bPos=pos.toBlockPos();
                     System.out.printf("\t/tp @p %d ~ %d%n",bPos.getX(),bPos.getZ());
