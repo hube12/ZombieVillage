@@ -1,13 +1,16 @@
 package com.seedfinding.neil;
 
+import kaptainwutax.biomeutils.source.BiomeSource;
 import kaptainwutax.biomeutils.source.OverworldBiomeSource;
 import kaptainwutax.featureutils.structure.Village;
 import kaptainwutax.mcutils.rand.ChunkRand;
 import kaptainwutax.mcutils.rand.seed.StructureSeed;
+import kaptainwutax.mcutils.state.Dimension;
 import kaptainwutax.mcutils.util.pos.BPos;
 import kaptainwutax.mcutils.util.pos.CPos;
 import kaptainwutax.mcutils.util.pos.RPos;
 import kaptainwutax.mcutils.version.MCVersion;
+import kaptainwutax.terrainutils.TerrainGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +51,7 @@ public class ZombieVillage {
                 }
             }
         }
-        if (nbr > 15) {
+        if (nbr > 23) {
             System.out.println(nbr + ": Potential " + structureSeed);
             fullCheck(structureSeed);
         }
@@ -56,8 +59,7 @@ public class ZombieVillage {
 
 
     public static void fullCheck(long structureSeed) {
-        long start=System.nanoTime();
-        StructureSeed.getWorldSeeds(structureSeed).asStream().boxed().forEach(ws -> {
+        StructureSeed.getWorldSeeds(structureSeed).asStream().boxed().parallel().forEach(ws -> {
             ChunkRand rand = new ChunkRand();
             Village village = new Village(VERSION);
             RPos minBound = new BPos(-3000, 0, -3000).toRegionPos(village.getSpacing() * 16);
@@ -80,6 +82,5 @@ public class ZombieVillage {
                 }
             }
         });
-        System.out.println(System.nanoTime()-start);
     }
 }
