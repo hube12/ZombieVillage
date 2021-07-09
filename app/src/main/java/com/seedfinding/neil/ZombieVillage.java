@@ -17,7 +17,7 @@ public class ZombieVillage {
     public static final MCVersion VERSION = MCVersion.v1_17;
 
     public static void main(String[] args) {
-        LongStream.rangeClosed(0, 1L << 48).parallel().forEach(ZombieVillage::run);
+        LongStream.rangeClosed(0, 1L << 48).sequential().forEach(ZombieVillage::run);
     }
 
     public static void run(long structureSeed) {
@@ -48,7 +48,7 @@ public class ZombieVillage {
                 }
             }
         }
-        if (nbr > 12) {
+        if (nbr > 15) {
             System.out.println(nbr + ": Potential " + structureSeed);
             fullCheck(structureSeed);
         }
@@ -56,6 +56,7 @@ public class ZombieVillage {
 
 
     public static void fullCheck(long structureSeed) {
+        long start=System.nanoTime();
         StructureSeed.getWorldSeeds(structureSeed).asStream().boxed().forEach(ws -> {
             ChunkRand rand = new ChunkRand();
             Village village = new Village(VERSION);
@@ -64,14 +65,14 @@ public class ZombieVillage {
             List<CPos> posList = new ArrayList<>();
             OverworldBiomeSource biomeSource = new OverworldBiomeSource(VERSION, ws);
             for (int regX = minBound.getX() + 1; regX <= maxBound.getX(); regX++) {
-                for (int regZ = minBound.getZ() + 1; regZ < maxBound.getZ(); regZ++) {
+                for (int regZ = minBound.getZ() + 1; regZ <= maxBound.getZ(); regZ++) {
                     CPos pos = village.getInRegion(structureSeed, regX, regZ, rand);
                     if (village.canSpawn(pos, biomeSource) && village.isZombieVillage(structureSeed, pos, rand)) {
                         posList.add(pos);
                     }
                 }
             }
-            if (posList.size() > 5) {
+            if (posList.size() > 9) {
                 System.out.printf("Found %d zombie village for world seed %d%n", posList.size(), ws);
                 for (CPos pos : posList) {
                     BPos bPos = pos.toBlockPos();
@@ -79,5 +80,6 @@ public class ZombieVillage {
                 }
             }
         });
+        System.out.println(System.nanoTime()-start);
     }
 }
